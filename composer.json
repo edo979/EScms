@@ -1,0 +1,7 @@
+{
+    "name": "escms",
+    "autoload": {
+        "classmap": ["framework/"]
+    }
+    
+}
