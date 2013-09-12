@@ -15,11 +15,39 @@ class TestClass
      */
     private $testProperty;
 
+    /**
+     * @read
+     */
+    private $testPropertyNew;
+
+    /**
+     * @read
+     */
+    private function testMethod()
+    {
+        
+    }
+
+    /**
+     * @read
+     */
+    private function testMethodNew()
+    {
+        
+    }
+
 }
 
 class TestClass1
 {
+
     private $testProperty;
+
+    private function testMethod()
+    {
+        
+    }
+
 }
 
 function inspectorFactory($class = null)
@@ -66,13 +94,51 @@ class InspectorTest extends \PHPUnit_Framework_TestCase
         $inspector = inspectorFactory(new TestClass);
         $result = $inspector->getClassMeta();
         assertEquals($result, array(
-            '@read' => TRUE,
+            '@read'   => TRUE,
             '@author' => array('Edis', 'Selimovic')
         ));
-        
+
         // Testing class whithout comments
         $inspector = inspectorFactory(new TestClass1);
         $result = $inspector->getClassMeta();
+        assertEquals($result, NULL);
+    }
+
+    public function testGetClassProperties()
+    {
+        $inspector = inspectorFactory(new TestClass);
+        $result = $inspector->getClassProperties();
+        assertEquals($result, array('testProperty', 'testPropertyNew'));
+    }
+
+    public function testGetClassMethods()
+    {
+        $inspector = inspectorFactory(new TestClass);
+        $result = $inspector->getClassMethods();
+        assertEquals($result, array('testMethod', 'testMethodNew'));
+    }
+
+    public function testGetPropertyMeta()
+    {
+        $inspector = inspectorFactory(new TestClass);
+        $result = $inspector->getPropertyMeta('testProperty');
+        assertEquals($result, array('@read' => TRUE));
+
+        // no meta data
+        $inspector = inspectorFactory(new TestClass1);
+        $result = $inspector->getPropertyMeta('testProperty');
+        assertEquals($result, NULL);
+    }
+
+    public function testGetMethodMeta()
+    {
+        $inspector = inspectorFactory(new TestClass);
+        $result = $inspector->getMethodMeta('testMethod');
+        assertEquals($result, array('@read' => TRUE));
+
+        // no meta data
+        $inspector = inspectorFactory(new TestClass1);
+        $result = $inspector->getMethodMeta('testMethod');
         assertEquals($result, NULL);
     }
 
