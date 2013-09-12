@@ -38,13 +38,17 @@ class InspectorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    function testParseMethodForReadingComment()
+    function testParseMethodForMakingKeyValuePairs()
     {
+        // @read, @write, @readwrite ...
         $parse = self::getMethod('_parse');
         $inspector = inspectorFactory();
-        $comment = $parse->invokeArgs($inspector, array('@comment'));
-
-        assertEquals($comment, array('@comment'));
+        
+        $comment = $parse->invokeArgs($inspector, array('@read'));
+        assertEquals($comment, array('@read' => TRUE));
+        
+        $comment = $parse->invokeArgs($inspector, array('@before method1, method2'));
+        assertEquals($comment, array('@before' => array('method1', 'method2')));
     }
 
 }

@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Framework\\ArrayMethods' => $baseDir . '/framework/ArrayMethods.php',
     'Framework\\Base' => $baseDir . '/framework/Base.php',
     'Framework\\Inspector' => $baseDir . '/framework/Inspector.php',
     'Framework\\StringMethods' => $baseDir . '/framework/StringMethods.php',
