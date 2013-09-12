@@ -6,10 +6,19 @@ class Inspector
 {
 
     protected $_class;
+    protected $_meta = array(
+        'class' => array()
+    );
 
     public function __construct($class)
     {
         $this->_class = $class;
+    }
+
+    protected function _getClassComment()
+    {
+        $reflection = new \ReflectionClass($this->_class);
+        return $reflection->getDocComment();
     }
 
     protected function _parse($comment)
@@ -27,21 +36,41 @@ class Inspector
                       StringMethods::split($match, "[\s]", 2)
                     )
                 );
-            }
 
-            $meta[$parts[0]] = TRUE;
 
-            if (sizeof($parts) > 1)
-            {
-                $meta[$parts[0]] = ArrayMethods::clean(
-                    ArrayMethods::trim(
-                      StringMethods::split($parts[1], ",")
-                    )
-                );
+                $meta[$parts[0]] = TRUE;
+
+                if (sizeof($parts) > 1)
+                {
+                    $meta[$parts[0]] = ArrayMethods::clean(
+                        ArrayMethods::trim(
+                          StringMethods::split($parts[1], ",")
+                        )
+                    );
+                }
             }
         }
 
         return $meta;
+    }
+
+    public function getClassMeta()
+    {
+        if (!isset($_meta['class']))
+        {
+            $comment = $this->_getClassComment();
+
+            if (!empty($comment))
+            {
+                $_meta['class'] = $this->_parse($comment);
+            }
+            else
+            {
+                $_meta['class'] = NULL;
+            }
+        }
+
+        return $_meta['class'];
     }
 
 }
