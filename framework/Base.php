@@ -6,7 +6,6 @@ use Framework\Inspector as Inspector;
 use Framework\StringMethods as StringMethods;
 use Framework\Core\Exception as Exception;
 
-
 class Base
 {
 
@@ -89,6 +88,26 @@ class Base
     {
         $function = "set" . ucfirst($name);
         return $this->$function($value);
+    }
+
+    protected function _getExceptionForReadonly($property)
+    {
+        return new Exception\ReadOnly("{$property} is read-only");
+    }
+
+    protected function _getExceptionForWriteonly($property)
+    {
+        return new Exception\WriteOnly("{$property} is write-only");
+    }
+
+    protected function _getExceptionForProperty()
+    {
+        return new Exception\Property("Invalid property");
+    }
+
+    protected function _getExceptionForImplementation($method)
+    {
+        return new Exception\Argument("{$method} method not implemented");
     }
 
 }
