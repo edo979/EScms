@@ -8,6 +8,12 @@ $baseDir = dirname($vendorDir);
 return array(
     'Framework\\ArrayMethods' => $baseDir . '/framework/ArrayMethods.php',
     'Framework\\Base' => $baseDir . '/framework/Base.php',
+    'Framework\\Core\\Exception' => $baseDir . '/framework/core/Exception.php',
+    'Framework\\Core\\Exception\\Argument' => $baseDir . '/framework/core/exception/Argument.php',
+    'Framework\\Core\\Exception\\Implementation' => $baseDir . '/framework/core/exception/Implementation.php',
+    'Framework\\Core\\Exception\\Property' => $baseDir . '/framework/core/exception/Property.php',
+    'Framework\\Core\\Exception\\ReadOnly' => $baseDir . '/framework/core/exception/Readonly.php',
+    'Framework\\Core\\Exception\\WriteOnly' => $baseDir . '/framework/core/exception/Writeonly.php',
     'Framework\\Inspector' => $baseDir . '/framework/Inspector.php',
     'Framework\\StringMethods' => $baseDir . '/framework/StringMethods.php',
 );
