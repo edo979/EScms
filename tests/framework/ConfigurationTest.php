@@ -42,7 +42,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testCreatingConfigurationDriverFactory()
     {
         $driver = $this->configuration->initialize();
-        assertEquals($driver, new Driver\Arr);
+        assertInstanceOf('Framework\Configuration\Driver', $driver);
 
         $configuration = new Configuration();
         $configuration->initialize();
