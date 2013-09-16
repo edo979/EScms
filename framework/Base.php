@@ -76,6 +76,8 @@ class Base
                 return $this;
             }
         }
+
+        throw $this->_getExceptionForImplementation($name);
     }
 
     public function __get($name)
