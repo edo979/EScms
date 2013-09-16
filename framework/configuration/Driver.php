@@ -10,5 +10,17 @@ use Framework\Configuration\Exception as Exception;
  */
 class Driver extends Base
 {
-    //put your code here
+
+    protected $_parsed = array();
+
+    public function initialize()
+    {
+        return $this;
+    }
+
+    protected function _getExceptionForImplementation($method)
+    {
+        return new Exception\Implementation("{$method} method not implemented");
+    }
+
 }
