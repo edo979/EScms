@@ -1,5 +1,20 @@
 <?php
 
+class ForTestDispachMethod extends Framework\Router
+{
+
+    /**
+     * @readwrite
+     */
+    protected $_testCallPassMethod = array();
+
+    protected function _pass($controller, $action, $parameters)
+    {
+        $this->testCallPassMethod = array($controller, $action, $parameters);
+    }
+
+}
+
 class RouterTest extends PHPUnit_Framework_TestCase
 {
 
@@ -34,6 +49,25 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $list = $router->getRoutes();
 
         assertEquals($list, array());
+    }
+
+    public function testPassingDataToMethodWhichWillCallController()
+    {
+        $router = new ForTestDispachMethod(array(
+            "url" => 'john/profile'
+        ));
+        $simpleRoute = new Framework\Router\Route\Simple(array(
+            'pattern'    => ':name/profile',
+            'controller' => 'index',
+            'action'     => 'home'
+        ));
+
+        $router->addRoute($simpleRoute);
+        $router->dispatch();
+
+        assertEquals($router->testCallPassMethod, array('index', 'home', array(
+                'name' => 'john')
+        ));
     }
 
 }

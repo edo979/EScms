@@ -38,7 +38,7 @@ class Router extends Base
     {
         return new Exception\Implementation("{$method} method not implemented");
     }
-    
+
     public function addRoute($route)
     {
         $this->_routes[] = $route;
@@ -48,15 +48,15 @@ class Router extends Base
     public function getRoutes()
     {
         $list = array();
-        
+
         foreach ($this->_routes as $route)
         {
             $list[$route->pattern] = get_class($route);
         }
-        
+
         return $list;
     }
-    
+
     public function removeRoute($route)
     {
         foreach ($this->_routes as $i => $stored)
@@ -66,7 +66,35 @@ class Router extends Base
                 unset($this->_routes[$i]);
             }
         }
-        
+
         return $this;
     }
+
+    public function dispatch()
+    {
+        $url = $this->url;
+        $parameters = array();
+        $controller = 'index';
+        $action = 'index';
+
+        foreach ($this->_routes as $route)
+        {
+            $matches = $route->match($url);
+            if ($matches)
+            {
+                $controller = $route->controller;
+                $action = $route->action;
+                $parameters = $route->parameters;
+
+                $this->_pass($controller, $action, $parameters);
+                return;
+            }
+        }
+    }
+
+    protected function _pass($controller, $action, $parameters)
+    {
+        
+    }
+
 }
