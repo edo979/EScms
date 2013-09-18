@@ -23,6 +23,7 @@ return array(
     'Framework\\Core\\Exception\\WriteOnly' => $baseDir . '/framework/core/exception/Writeonly.php',
     'Framework\\Inspector' => $baseDir . '/framework/Inspector.php',
     'Framework\\Registry' => $baseDir . '/framework/Registry.php',
+    'Framework\\Router' => $baseDir . '/framework/Router.php',
     'Framework\\Router\\Configuration\\Exception' => $baseDir . '/framework/router/Exception.php',
     'Framework\\Router\\Exception\\Action' => $baseDir . '/framework/router/exception/Action.php',
     'Framework\\Router\\Exception\\Argument' => $baseDir . '/framework/router/exception/Argument.php',
