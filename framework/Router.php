@@ -90,6 +90,21 @@ class Router extends Base
                 return;
             }
         }
+
+        $parts = explode('/', trim($url, '/'));
+
+        if (sizeof($parts) > 0)
+        {
+            $controller = $parts[0];
+
+            if (sizeof($parts) >= 2)
+            {
+                $action = $parts[1];
+                $parameters = array_slice($parts, 2);
+            }
+        }
+
+        $this->_pass($controller, $action, $parameters);
     }
 
     protected function _pass($controller, $action, $parameters)

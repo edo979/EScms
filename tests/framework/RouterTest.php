@@ -53,6 +53,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
     public function testPassingDataToMethodWhichWillCallController()
     {
+        //test defined route
         $router = new ForTestDispachMethod(array(
             "url" => 'john/profile'
         ));
@@ -67,6 +68,16 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
         assertEquals($router->testCallPassMethod, array('index', 'home', array(
                 'name' => 'john')
+        ));
+
+        // test inferred route
+        $router = new ForTestDispachMethod(array(
+            "url" => 'user/search/parameter'
+        ));
+        $router->dispatch();
+
+        assertEquals($router->testCallPassMethod, array('user', 'search', array(
+                'parameter')
         ));
     }
 
