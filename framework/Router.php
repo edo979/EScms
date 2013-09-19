@@ -109,7 +109,30 @@ class Router extends Base
 
     protected function _pass($controller, $action, $parameters)
     {
-        
+        $name = ucfirst($controller);
+
+        $this->_controller = $controller;
+        $this->_action = $action;
+
+        try
+        {
+            $instance = new $name(array(
+                'parameters' => $parameters
+            ));
+            Registry::set('controller', $instance);
+        }
+        catch (\Exception $e)
+        {
+            throw new Exception\Controller("Controller {$name} not found");
+        }
+
+        if (!method_exists($instance, $action))
+        {
+            $instance->willRenderLayoutView = false;
+            $instance->willRenderActionView = false;
+
+            throw new Exception\Action("Action {$action} not found");
+        }
     }
 
 }

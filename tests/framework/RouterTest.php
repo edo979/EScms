@@ -15,6 +15,31 @@ class ForTestDispachMethod extends Framework\Router
 
 }
 
+class ControllerTest extends Framework\Base
+{
+
+    /**
+     * @readwrite
+     */
+    protected $_parameters = array();
+
+    /**
+     * @readwrite
+     */
+    protected $_willRenderLayoutView = true;
+
+    /**
+     * @readwrite
+     */
+    protected $_willRenderActionView = true;
+
+    public function TestMethod()
+    {
+        
+    }
+
+}
+
 class RouterTest extends PHPUnit_Framework_TestCase
 {
 
@@ -79,6 +104,23 @@ class RouterTest extends PHPUnit_Framework_TestCase
         assertEquals($router->testCallPassMethod, array('user', 'search', array(
                 'parameter')
         ));
+    }
+
+    /**
+     * @expectedException        Framework\Router\Exception\Action
+     * @expectedExceptionMessage Action FalseTestMethod not found
+     */
+    public function testPassingDataToController()
+    {
+        // Make Instance of Controller
+        $router = new Framework\Router(array(
+            "url" => 'ControllerTest/FalseTestMethod/parameter'
+        ));
+        $router->dispatch();
+        $controller = Framework\Registry::get('controller');
+        assertInstanceOf('ControllerTest', $controller);
+
+        assertEquals($controller->willRenderActionView, FALSE);
     }
 
 }

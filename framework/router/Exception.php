@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Router\Configuration;
+namespace Framework\Router;
 
 use Framework\Core as Core;
 
