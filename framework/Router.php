@@ -33,6 +33,16 @@ class Router extends Base
      */
     protected $_action;
     protected $_routes = array();
+    private $_inspector;
+
+    /**
+     * executed Controller method,
+     * if method must execute only once
+     * hook check is method execute and run method if is not in array
+     * 
+     * @var type string
+     */
+    private $_run = array();
 
     public function _getExceptionForImplementation($method)
     {
@@ -133,8 +143,43 @@ class Router extends Base
 
             throw new Exception\Action("Action {$action} not found");
         }
-        
-        // TODO: make $this->hook() method
+
+        $this->_inspector = new Inspector($instance);
+        $methodMeta = $this->_inspector->getMethodMeta($action);
+
+        // TODO: method meta @private @protected
+
+        $this->_hook($methodMeta, '@before');
+
+        call_user_func_array(array(
+            $instance,
+            $action
+        ), is_array($parameters) ? $parameters : array());
+
+        $this->_hook($methodMeta, '@after');
+
+        // unset Controller
+        Registry::erase('controller');
+    }
+
+    private function _hook($meta, $type)
+    {
+        if (isset($meta[$type]))
+        {
+            foreach ($meta[$type] as $method)
+            {
+                $hookMeta = $this->_inspector->getMethodMeta($method);
+
+                if (in_array($method, $this->_run) && !empty($hookMeta['@once']))
+                {
+                    continue;
+                }
+
+                $controller = Registry::get('controller');
+                $controller->{$method}();
+                $this->_run[] = $method;
+            }
+        }
     }
 
 }

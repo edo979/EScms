@@ -32,16 +32,17 @@ class ControllerTest extends Framework\Base
      * @readwrite
      */
     protected $_willRenderActionView = true;
-    public $once = 0;
-    public $hook = 0;
+    public static $once = 0;
+    public static $hook = 0;
+    public static $callMethod;
 
     /**
      * @before TestOnce, TestHook
      * @after TestOnce, TestHook
      */
-    public function TestMethod()
+    public function TestMethod($parameter)
     {
-        
+        static::$callMethod = $parameter;
     }
 
     /**
@@ -49,12 +50,12 @@ class ControllerTest extends Framework\Base
      */
     public function TestOnce()
     {
-        $this->once = $this->once + 1;
+        static::$once++;
     }
 
     public function TestHook()
     {
-        $this->hook = $this->hook + 1;
+        static::$hook++;
     }
 
 }
@@ -144,7 +145,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         assertEquals($controller->willRenderActionView, FALSE);
     }
 
-    public function testHookForCallingMethodsBeforeAfter()
+    public function testHookCallMethodsBeforeAfterExecutingControllerMethod()
     {
         $router = new Framework\Router(array(
             "url" => 'ControllerTest/TestMethod/parameter'
@@ -155,9 +156,12 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
         $controller = Framework\Registry::get('controller');
 
-        // Controller should be call methods in metaData
-        assertEquals($controller->once, 1);
-        assertEquals($controller->hook, 2);
+        // Execute methods in meta data
+        assertEquals(ControllerTest::$once, 1);
+        assertEquals(ControllerTest::$hook, 2);
+
+        // Controller method
+        assertEquals(ControllerTest::$callMethod, 'parameter');
     }
 
 }
