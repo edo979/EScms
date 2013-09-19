@@ -133,6 +133,8 @@ class Router extends Base
 
             throw new Exception\Action("Action {$action} not found");
         }
+        
+        // TODO: make $this->hook() method
     }
 
 }

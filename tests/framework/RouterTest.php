@@ -32,10 +32,29 @@ class ControllerTest extends Framework\Base
      * @readwrite
      */
     protected $_willRenderActionView = true;
+    public $once = 0;
+    public $hook = 0;
 
+    /**
+     * @before TestOnce, TestHook
+     * @after TestOnce, TestHook
+     */
     public function TestMethod()
     {
         
+    }
+
+    /**
+     * @once
+     */
+    public function TestOnce()
+    {
+        $this->once = $this->once + 1;
+    }
+
+    public function TestHook()
+    {
+        $this->hook = $this->hook + 1;
     }
 
 }
@@ -112,15 +131,33 @@ class RouterTest extends PHPUnit_Framework_TestCase
      */
     public function testPassingDataToController()
     {
-        // Make Instance of Controller
         $router = new Framework\Router(array(
             "url" => 'ControllerTest/FalseTestMethod/parameter'
         ));
+
+        // Make Instance of Controller
         $router->dispatch();
+
         $controller = Framework\Registry::get('controller');
         assertInstanceOf('ControllerTest', $controller);
 
         assertEquals($controller->willRenderActionView, FALSE);
+    }
+
+    public function testHookForCallingMethodsBeforeAfter()
+    {
+        $router = new Framework\Router(array(
+            "url" => 'ControllerTest/TestMethod/parameter'
+        ));
+
+        // Make Instance of Controller
+        $router->dispatch();
+
+        $controller = Framework\Registry::get('controller');
+
+        // Controller should be call methods in metaData
+        assertEquals($controller->once, 1);
+        assertEquals($controller->hook, 2);
     }
 
 }
