@@ -12,5 +12,42 @@ use Framework\Database\Exception as Exception;
  */
 class Mysql extends Database\Connector
 {
-    //put your code here
+
+    protected $_service;
+
+    /**
+     * @readwrite
+     */
+    protected $_host;
+
+    /**
+     * @readwrite
+     */
+    protected $_username;
+
+    /**
+     * @readwrite
+     */
+    protected $_password;
+
+    /**
+     * @readwrite
+     */
+    protected $_schema;
+
+    /**
+     * @readwrite
+     */
+    protected $_port = "3306";
+
+    /**
+     * @readwrite
+     */
+    protected $_charset = "utf8";
+
+    /**
+     * @readwrite
+     */
+    protected $_engine = "InnoDB";
+
 }

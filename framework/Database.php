@@ -4,7 +4,7 @@ namespace Framework;
 
 use Framework\Base as Base;
 use Framework\Database as Database;
-use Framework\Registry as Rgistry;
+use Framework\Registry as Registry;
 use Framework\Database\Exception as Exception;
 
 /**
@@ -32,10 +32,25 @@ class Database extends Base
 
     public function initialize()
     {
-//        if(!$this->type)
-//        {
-//            
-//        }
+        if (!$this->type)
+        {
+            $configuration = Registry::get('configuration');
+            if ($configuration)
+            {
+                $settings = array();
+
+                $configuration = $configuration->initialize();
+                $settings = $configuration->parse('application/configuration/database');
+
+                if (!empty($settings) && !empty($settings['provider']))
+                {
+                    $this->type = $settings['provider'];
+                    array_shift($settings);
+
+                    $this->options = (array) $settings;
+                }
+            }
+        }
 
         if (!$this->type)
         {

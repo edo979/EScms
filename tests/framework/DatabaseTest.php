@@ -27,12 +27,25 @@ class DatabaseTest extends PHPUnit_Framework_TestCase
 
     public function testDatabaseFactoryMakeConnector()
     {
-        $database = new Framework\Database(array(
+        $db = new Framework\Database(array(
             'type' => 'mysql'
         ));
-        $connector = $database->initialize();
+        $connector = $db->initialize();
 
         assertInstanceOf('Framework\Database\Connector\Mysql', $connector);
+
+        // Set database settings using configuration and registry
+        $instance = new Framework\Configuration(array(
+            'type' => 'array'
+        ));
+        Framework\Registry::set('configuration', $instance);
+
+        // Get Type from Configuration using registry
+        $dbConf = new Framework\Database();
+        // Get Connector
+        $connectorConf = $dbConf->initialize();
+        assertInstanceOf('Framework\Database\Connector', $connectorConf);
+        
     }
 
 }
