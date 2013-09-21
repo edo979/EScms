@@ -13,8 +13,6 @@ use Framework\Database\Exception as Exception;
 class Mysql extends Database\Connector
 {
 
-    protected $_service;
-
     /**
      * @readwrite
      */
@@ -49,5 +47,34 @@ class Mysql extends Database\Connector
      * @readwrite
      */
     protected $_engine = "InnoDB";
+
+    /**
+     * @readwrite
+     */
+    protected $_isConnected = false;
+    protected $_service;
+
+    protected function _isValidService()
+    {
+        $isEmpty = empty($this->_service);
+        $isInstance = $this->_service instanceof \MySqli;
+        
+        if ($this->isConnected && $isInstance && !isEmpty)
+        {
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+
+    public function connect()
+    {
+        if (!$this->_isValidService())
+        {
+            $this->isConnected = TRUE;
+        }
+        
+        return $this;
+    }
 
 }
