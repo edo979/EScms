@@ -160,4 +160,34 @@ class Mysql extends Database\Connector
         return $this->_service->real_escape_string($value);
     }
 
+    public function getLastInsertId()
+    {
+        if (!$this->_isValidService())
+        {
+            throw new Exception\Service("Not connected to a valid service");
+        }
+
+        return $this->_service->insert_id;
+    }
+
+    public function getAffectedRows()
+    {
+        if (!$this->_isValidService())
+        {
+            throw new Exception\Service("Not connected to a valid service");
+        }
+
+        return $this->_service->affected_rows;
+    }
+
+    public function getLastError()
+    {
+        if (!$this->_isValidService())
+        {
+            throw new Exception\Service("Not connected to a valid service");
+        }
+
+        return $this->_service->error;
+    }
+
 }

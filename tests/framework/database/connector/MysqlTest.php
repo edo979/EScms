@@ -78,7 +78,7 @@ class MysqlTest extends PHPUnit_Framework_TestCase
         $this->mysqli->execute('sql');
     }
 
-    public function testEscepingValue()
+    public function testEscapingValue()
     {
         $mock = $this->getMock('mysqli');
         $mock->expects($this->once())
