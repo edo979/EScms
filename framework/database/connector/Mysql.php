@@ -6,9 +6,8 @@ use Framework\Database as Database;
 use Framework\Database\Exception as Exception;
 
 /**
- * Description of Mysql
+ * Connector to Mysql
  *
- * @author Comp
  */
 class Mysql extends Database\Connector
 {
@@ -52,13 +51,23 @@ class Mysql extends Database\Connector
      * @readwrite
      */
     protected $_isConnected = false;
+
+    /**
+     *
+     * @var object (mysqli)
+     */
     protected $_service;
 
+    /**
+     * Validate connection to database
+     * 
+     * @return boolean
+     */
     protected function _isValidService()
     {
         $isEmpty = empty($this->_service);
         $isInstance = $this->_service instanceof \MySqli;
-        
+
         if ($this->isConnected && $isInstance && !isEmpty)
         {
             return TRUE;
@@ -67,13 +76,29 @@ class Mysql extends Database\Connector
         return FALSE;
     }
 
+    /**
+     * Connect to database using MySQLi
+     * 
+     * @return \Framework\Database\Connector\Mysql (this)
+     */
     public function connect()
     {
         if (!$this->_isValidService())
         {
+            try
+            {
+                $this->_service = mysqli_connect(
+                $this->_host, $this->_username, $this->_password, $this->_schema, $this->_port
+                );
+            }
+            catch (\Exception $e)
+            {
+                throw new Exception\Service("Unable to connect to service");
+            }
+
             $this->isConnected = TRUE;
         }
-        
+
         return $this;
     }
 

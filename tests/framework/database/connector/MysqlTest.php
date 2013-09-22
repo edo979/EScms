@@ -6,11 +6,18 @@
 class Database extends Framework\Database\Connector\Mysql
 {
 
-    protected $_service = NULL;
+    protected $_host = '127.0.0.1';
+    protected $_username = 'error';
+    protected $_password = 'error';
 
     function get_isConnected()
     {
         return $this->_isConnected;
+    }
+
+    function get_service()
+    {
+        return $this->_service;
     }
 
 }
@@ -18,18 +25,14 @@ class Database extends Framework\Database\Connector\Mysql
 class MysqlTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testWeHaveValidService()
+    /**
+     * @expectedException        Framework\Database\Exception\Service
+     * @expectedExceptionMessage Unable to connect to service
+     */
+    public function testExceptionForConnectionError()
     {
-        $service = new stdClass();
         $mysql = new Database();
-
-        // For first time connection
-        assertNotInstanceOf('Framework\Database\Connector\Mysql', $service);
-        $service = $mysql->connect();
-        assertEquals($mysql->_isConnected, TRUE);
-
-        // Test for connected service
-        assertInstanceOf('Framework\Database\Connector\Mysql', $service);
+        $mysql->connect(); // Throw Exception
     }
 
 }
