@@ -53,7 +53,6 @@ class Mysql extends Database\Connector
     protected $_isConnected = false;
 
     /**
-     *
      * @var object (mysqli)
      */
     protected $_service;
@@ -65,10 +64,10 @@ class Mysql extends Database\Connector
      */
     protected function _isValidService()
     {
-        $isEmpty = empty($this->_service);
+        $isEmpty    = empty($this->_service);
         $isInstance = $this->_service instanceof \MySqli;
 
-        if ($this->isConnected && $isInstance && !isEmpty)
+        if ($this->isConnected && $isInstance && !$isEmpty)
         {
             return TRUE;
         }
@@ -77,7 +76,6 @@ class Mysql extends Database\Connector
     }
 
     /**
-     * Connect to database using MySQLi
      * 
      * @return \Framework\Database\Connector\Mysql (this)
      */
@@ -88,7 +86,7 @@ class Mysql extends Database\Connector
             try
             {
                 $this->_service = mysqli_connect(
-                $this->_host, $this->_username, $this->_password, $this->_schema, $this->_port
+                  $this->_host, $this->_username, $this->_password, $this->_schema, $this->_port
                 );
             }
             catch (\Exception $e)
@@ -100,6 +98,66 @@ class Mysql extends Database\Connector
         }
 
         return $this;
+    }
+
+    /**
+     * 
+     * @return \Framework\Database\Connector\Mysql (this)
+     */
+    public function disconnect()
+    {
+        if ($this->_isValidService())
+        {
+            $this->isConnected = FALSE;
+            $this->_service->close();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Build class for basic CRUD on database
+     * 
+     * @return \Framework\Database\Query\Mysql
+     */
+    public function query()
+    {
+        return new Database\Query\Mysql(array(
+            'connector' => $this
+        ));
+    }
+
+    /**
+     * Execute raw query
+     * 
+     * @param string $sql
+     * @return mixed
+     * @throws Exception\Service
+     */
+    public function execute($sql)
+    {
+        if (!$this->_isValidService())
+        {
+            throw new Exception\Service("Not connected to a valid service");
+        }
+
+        return $this->_service->query($sql);
+    }
+
+    /**
+     *
+     * @param string $value
+     * @return string
+     * @throws Exception\Service
+     */
+    public function escape($value)
+    {
+        if (!$this->_isValidService())
+        {
+            throw new Exception\Service("Not connected to a valid service");
+        }
+
+        return $this->_service->real_escape_string($value);
     }
 
 }

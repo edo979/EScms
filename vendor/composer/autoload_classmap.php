@@ -28,6 +28,7 @@ return array(
     'Framework\\Database\\Exception\\Argument' => $baseDir . '/framework/database/exception/Argument.php',
     'Framework\\Database\\Exception\\Implementation' => $baseDir . '/framework/database/exception/Implementation.php',
     'Framework\\Database\\Exception\\Service' => $baseDir . '/framework/database/exception/Service.php',
+    'Framework\\Database\\Query\\Mysql' => $baseDir . '/framework/database/query/Mysql.php',
     'Framework\\Inspector' => $baseDir . '/framework/Inspector.php',
     'Framework\\Registry' => $baseDir . '/framework/Registry.php',
     'Framework\\Router' => $baseDir . '/framework/Router.php',
