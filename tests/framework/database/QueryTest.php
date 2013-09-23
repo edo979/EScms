@@ -3,30 +3,45 @@
 class QueryTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testQuotingInputDataForMysqlDatabase()
+    public $mock;
+    public $query;
+    public $reflector;
+
+    public function setUp()
     {
         // Mock connector
-        $mock = $this->getMock('Framework\Database\Connector\Mysql');
-        $mock->expects(once())
+        $this->mock = $this->getMock('Framework\Database\Connector\Mysql');
+        $this->mock->expects(once())
           ->method('escape')
           ->with($this->stringContains('test'));
 
         // Make instance of testing class
-        $mysql = new Framework\Database\Query;
+        $this->query = new Framework\Database\Query;
 
         // Create reflection,
         // using protected method and property in tested class
-        $reflector = new ReflectionClass($mysql);
+        $this->reflector = new ReflectionClass($this->query);
 
-        $_connector = $reflector->getProperty('_connector');
+        $_connector = $this->reflector->getProperty('_connector');
         $_connector->setAccessible(TRUE);
-        $_connector->setValue($mysql, $mock);
+        $_connector->setValue($this->query, $this->mock);
+    }
 
-        $_quote = $reflector->getMethod('_quote');
+    public function tearDown()
+    {
+        $this->mock = null;
+        $this->query = null;
+        $this->reflector = null;
+    }
+
+    public function testQuotingInputDataForMysqlDatabase()
+    {
+        // test method for proper call
+        $_quote = $this->reflector->getMethod('_quote');
         $_quote->setAccessible(TRUE);
 
         //test call mocked object
-        $result = $_quote->invoke($mysql, 'test');
+        $_quote->invoke($this->query, 'test');
     }
 
 }
