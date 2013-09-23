@@ -66,6 +66,31 @@ class Query extends Base
             $escaped = $this->connector->escape($value);
             return "'{$escaped}'";
         }
+        
+        if (is_array($value))
+        {
+            $buffer = array();
+            
+            foreach ($value as $i)
+            {
+                array_push($buffer, $this->_quote($i));
+            }
+            
+            $buffer =  join(", ", $buffer);
+            return $buffer;
+        }
+        
+        if (is_null($value))
+        {
+            return "NULL";
+        }
+        
+        if (is_bool($value))
+        {
+            return (int) $value;
+        }
+        
+        return $this->connector->escape($value);
     }
 
 }
