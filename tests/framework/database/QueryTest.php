@@ -26,9 +26,18 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $this->_mock = null;
-        $this->query = null;
+        $this->_mock     = null;
+        $this->query     = null;
         $this->reflector = null;
+    }
+
+    /**
+     * @expectedException        Framework\Database\Exception\Implementation
+     * @expectedExceptionMessage ops method not implemented
+     */
+    public function testExceptionNotImplementMethod()
+    {
+        assertEquals($this->query->ops(), 'willThrowException');
     }
 
     public function testQuotingInputDataForMysqlDatabase()
@@ -46,13 +55,79 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         // call mocked object with array
         $_quote->invoke($this->query, array('test', 'test'));
-        
+
         // call mocked object with null
         $_quote->invoke($this->query, NULL);
-        
+
         // call mocked object with boolean
         $_quote->invoke($this->query, FALSE);
+    }
 
+    /**
+     * @expectedException        Framework\Database\Exception\Argument
+     * @expectedExceptionMessage Invalid argument
+     */
+    public function testSettingFromPropertyException()
+    {
+        $this->query->from('');
+    }
+
+    public function testSettingFromProperty()
+    {
+        $instance = $this->query->from('user', array('name', 'id'));
+
+        $_from = $this->reflector->getProperty('_from');
+        $_from->setAccessible(TRUE);
+        assertEquals('user', $_from->getValue($this->query));
+
+        $_fields = $this->reflector->getProperty('_fields');
+        $_fields->setAccessible(TRUE);
+        $fields  = $_fields->getValue($this->query);
+        assertEquals(array('name', 'id'), $fields['user']);
+
+        assertInstanceOf('Framework\Database\Query', $instance);
+    }
+
+    /**
+     * @expectedException        Framework\Database\Exception\Argument
+     * @expectedExceptionMessage Invalid argument
+     */
+    public function testSettingJoinPropertyException()
+    {
+        $this->query->join('', 'on');
+    }
+
+    /**
+     * @expectedException        Framework\Database\Exception\Argument
+     * @expectedExceptionMessage Invalid argument
+     */
+    public function testSettingJoinOnPropertyException()
+    {
+        $this->query->join('user', '');
+    }
+
+    public function testSettingJoinProperty()
+    {
+        $instance = $this->query->join('user', 'comment', array(
+            'username' => 'name',
+            'comment'
+        ));
+
+        $_fields = $this->reflector->getProperty('_fields');
+        $_fields->setAccessible(TRUE);
+        $fields  = $_fields->getValue($this->query);
+
+        assertEquals(array(
+            'username' => 'name',
+            'comment'
+          ), $fields['user']);
+
+        $_join = $this->reflector->getProperty('_join');
+        $_join->setAccessible(TRUE);
+
+        assertEquals($_join->getValue($this->query), "JOIN user ON comment");
+
+        assertInstanceOf('Framework\Database\Query', $instance);
     }
 
 }

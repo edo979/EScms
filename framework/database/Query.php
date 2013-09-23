@@ -22,7 +22,7 @@ class Query extends Base
     /**
      * @read
      */
-    protected $_fields;
+    protected $_fields = array();
 
     /**
      * @read
@@ -58,7 +58,7 @@ class Query extends Base
     {
         return new Exception\Implementation("{$method} method not implemented");
     }
-    
+
     protected function _quote($value)
     {
         if (is_string($value))
@@ -66,31 +66,66 @@ class Query extends Base
             $escaped = $this->connector->escape($value);
             return "'{$escaped}'";
         }
-        
+
         if (is_array($value))
         {
             $buffer = array();
-            
+
             foreach ($value as $i)
             {
                 array_push($buffer, $this->_quote($i));
             }
-            
-            $buffer =  join(", ", $buffer);
+
+            $buffer = join(", ", $buffer);
             return $buffer;
         }
-        
+
         if (is_null($value))
         {
             return "NULL";
         }
-        
+
         if (is_bool($value))
         {
             return (int) $value;
         }
-        
+
         return $this->connector->escape($value);
+    }
+
+    public function from($from, $fields = array("*"))
+    {
+        if (empty($from))
+        {
+            throw new Exception\Argument('Invalid argument');
+        }
+
+        $this->_from = $from;
+
+        if ($fields)
+        {
+            $this->_fields[$from] = $fields;
+        }
+
+        return $this;
+    }
+
+    public function join($join, $on, $fields = array())
+    {
+        if (empty($join))
+        {
+            throw new Exception\Argument('Invalid argument');
+        }
+
+        if (empty($on))
+        {
+            throw new Exception\Argument('Invalid argument');
+        }
+
+        $this->_fields = $this->_fields + array($join => $fields);
+        $this->_join   = "JOIN {$join} ON {$on}";
+
+        return $this;
     }
 
 }
