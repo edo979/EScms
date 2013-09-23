@@ -5,7 +5,7 @@ namespace Framework\Database\Query;
 /**
  * Description of Mysql
  *
- * @author Comp
+ * @author nastavnik
  */
 class Mysql
 {
