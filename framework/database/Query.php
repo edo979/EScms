@@ -59,9 +59,13 @@ class Query extends Base
         return new Exception\Implementation("{$method} method not implemented");
     }
     
-    protected function _quote()
+    protected function _quote($value)
     {
-        
+        if (is_string($value))
+        {
+            $escaped = $this->connector->escape($value);
+            return "'{$escaped}'";
+        }
     }
 
 }
