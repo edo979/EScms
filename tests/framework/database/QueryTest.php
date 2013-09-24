@@ -66,7 +66,6 @@ class QueryTest extends PHPUnit_Framework_TestCase
         // call _quote with boolean
         $escaped = $_quote->invoke($this->query, FALSE);
         assertEquals(0, $escaped);
-
     }
 
     /**
@@ -213,6 +212,33 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         // stub will return 'clean'
         assertEquals("user = 'clean' and comment = 'clean'", $_where->getValue($this->query));
+    }
+
+    public function testBuildingSelectQueries()
+    {
+        // Stub escepe method in connector class
+        $this->mock->expects($this->any())
+          ->method('escape')
+          ->will($this->returnValue('clean'));
+        
+        // set query parameters
+        $this->query->from('user', array('id', 'username'));
+        $this->query->join('user', 'comment', array(
+            'username' => 'name',
+            'comment'
+        ));
+        $this->query->where('user = ? AND id = ?', 'john', 1); // use stub
+        $this->query->order('user', 'DESC');
+        $this->query->limit(5, 3);
+
+        // build query
+        $_select = $this->reflector->getMethod('_buildSelect');
+        $_select->setAccessible(TRUE);
+        $selectQuery = $_select->invoke($this->query);
+        
+        assertEquals(
+          "SELECT id, username FROM user JOIN user ON comment WHERE user = 'clean' AND id = 'clean' ORDER BY user DESC LIMIT 5, 10"
+          , $selectQuery);
     }
 
 }

@@ -93,6 +93,11 @@ class Query extends Base
         return $this->connector->escape($value);
     }
 
+    protected function _buildSelect()
+    {
+        
+    }
+
     public function from($from, $fields = array("*"))
     {
         if (empty($from))
@@ -123,37 +128,37 @@ class Query extends Base
         }
 
         $this->_fields = $this->_fields + array($join => $fields);
-        $this->_join   = "JOIN {$join} ON {$on}";
+        $this->_join = "JOIN {$join} ON {$on}";
 
         return $this;
     }
-    
+
     public function limit($limit, $page = 1)
     {
         if (empty($limit))
         {
             throw new Exception\Argument('Invalid argument');
         }
-        
+
         $this->_limit = $limit;
         $this->_offset = $limit * ($page - 1);
-        
+
         return $this;
     }
-    
+
     public function order($order, $direction = 'asc')
     {
         if (empty($order))
         {
             throw new Exception\Argument('Invalid argument');
         }
-        
+
         $this->_order = $order;
         $this->_direction = $direction;
-        
+
         return $this;
     }
-    
+
     public function where()
     {
         $arguments = func_get_args();
@@ -161,15 +166,15 @@ class Query extends Base
         {
             throw new Exception\Argument('Invalid argument');
         }
-        
+
         $arguments[0] = preg_replace('#\?#', '%s', $arguments[0]);
         $parameters = array_slice($arguments, 1, NULL, TRUE);
-        
+
         foreach ($parameters as $i => $parameter)
         {
             $arguments[$i] = $this->_quote($arguments[$i]);
         }
-        
+
         $this->_where = call_user_func_array('sprintf', $arguments);
     }
 
