@@ -95,7 +95,61 @@ class Query extends Base
 
     protected function _buildSelect()
     {
+        $fields = array();
+        $where = $order = $join = $limit = '';
+        $template = "SELECT %s FROM %s %s %s %s %s";
         
+        foreach ($this->fields as $table => $_fields)
+        {
+            foreach ($_fields as $field => $alias)
+            {
+                if (is_string($field))
+                {
+                    $fields[] = "{$field} AS {$alias}";
+                }
+                else
+                {
+                    $fields[] = "{$alias}";
+                }
+            }
+        }
+        
+        $fields = join(", ", $fields);
+        
+        $_join = $this->join;
+        if (!empty($_join))
+        {
+            $join = join(" ", $_join);
+        }
+        
+        $_where = $this->where;
+        if (!empty($_where))
+        {
+            $joined = join(" AND ", $_where);
+            $where = "WHERE {$joined}";
+        }
+        
+        $_order = $this->order;
+        if (!empty($_order))
+        {
+            $order = "ORDER BY {$_order} {$this->direction}";
+        }
+        
+        $_limit = $this->limit;
+        if (!empty($_limit))
+        {
+            $_offset = $this->offset;
+            if (!empty($_offset))
+            {
+                $limit = "LIMIT {$_limit}, {$_offset}";
+            }
+            else
+            {
+                $limit = "LIMIT {$limit}";
+            }
+        }
+        
+        return sprintf($template, $fields, $this->from, $join, $where, $order, $limit);
     }
 
     public function from($from, $fields = array("*"))
@@ -127,8 +181,8 @@ class Query extends Base
             throw new Exception\Argument('Invalid argument');
         }
 
-        $this->_fields = $this->_fields + array($join => $fields);
-        $this->_join = "JOIN {$join} ON {$on}";
+        $this->_fields += array($join => $fields);
+        $this->_join[] = "JOIN {$join} ON {$on}";
 
         return $this;
     }
@@ -175,7 +229,7 @@ class Query extends Base
             $arguments[$i] = $this->_quote($arguments[$i]);
         }
 
-        $this->_where = call_user_func_array('sprintf', $arguments);
+        $this->_where[] = call_user_func_array('sprintf', $arguments);
     }
 
 }

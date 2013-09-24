@@ -130,7 +130,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $_join = $this->reflector->getProperty('_join');
         $_join->setAccessible(TRUE);
 
-        assertEquals($_join->getValue($this->query), "JOIN user ON comment");
+        assertEquals($_join->getValue($this->query), array("JOIN user ON comment"));
 
         assertInstanceOf('Framework\Database\Query', $instance);
     }
@@ -211,7 +211,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $_where->setAccessible(TRUE);
 
         // stub will return 'clean'
-        assertEquals("user = 'clean' and comment = 'clean'", $_where->getValue($this->query));
+        assertEquals(array("user = 'clean' and comment = 'clean'"), $_where->getValue($this->query));
     }
 
     public function testBuildingSelectQueries()
@@ -223,10 +223,11 @@ class QueryTest extends PHPUnit_Framework_TestCase
         
         // set query parameters
         $this->query->from('user', array('id', 'username'));
-        $this->query->join('user', 'comment', array(
-            'username' => 'name',
+        $this->query->join('comment', 'user', array(
+            'comment.user_id' => 'user',
             'comment'
         ));
+        $this->query->where('user = id'); // use stub
         $this->query->where('user = ? AND id = ?', 'john', 1); // use stub
         $this->query->order('user', 'DESC');
         $this->query->limit(5, 3);
@@ -237,7 +238,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $selectQuery = $_select->invoke($this->query);
         
         assertEquals(
-          "SELECT id, username FROM user JOIN user ON comment WHERE user = 'clean' AND id = 'clean' ORDER BY user DESC LIMIT 5, 10"
+          "SELECT id, username, comment.user_id AS user, comment FROM user JOIN comment ON user WHERE user = id AND user = 'clean' AND id = clean ORDER BY user DESC LIMIT 5, 10"
           , $selectQuery);
     }
 
