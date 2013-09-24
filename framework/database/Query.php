@@ -127,5 +127,31 @@ class Query extends Base
 
         return $this;
     }
+    
+    public function limit($limit, $page = 1)
+    {
+        if (empty($limit))
+        {
+            throw new Exception\Argument('Invalid argument');
+        }
+        
+        $this->_limit = $limit;
+        $this->_offset = $limit * ($page - 1);
+        
+        return $this;
+    }
+    
+    public function order($order, $direction = 'asc')
+    {
+        if (empty($order))
+        {
+            throw new Exception\Argument('Invalid argument');
+        }
+        
+        $this->_order = $order;
+        $this->_direction = $direction;
+        
+        return $this;
+    }
 
 }

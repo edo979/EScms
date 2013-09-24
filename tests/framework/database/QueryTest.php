@@ -26,8 +26,8 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $this->_mock     = null;
-        $this->query     = null;
+        $this->_mock = null;
+        $this->query = null;
         $this->reflector = null;
     }
 
@@ -82,7 +82,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         $_fields = $this->reflector->getProperty('_fields');
         $_fields->setAccessible(TRUE);
-        $fields  = $_fields->getValue($this->query);
+        $fields = $_fields->getValue($this->query);
         assertEquals(array('name', 'id'), $fields['user']);
 
         assertInstanceOf('Framework\Database\Query', $instance);
@@ -115,7 +115,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         $_fields = $this->reflector->getProperty('_fields');
         $_fields->setAccessible(TRUE);
-        $fields  = $_fields->getValue($this->query);
+        $fields = $_fields->getValue($this->query);
 
         assertEquals(array(
             'username' => 'name',
@@ -126,6 +126,58 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $_join->setAccessible(TRUE);
 
         assertEquals($_join->getValue($this->query), "JOIN user ON comment");
+
+        assertInstanceOf('Framework\Database\Query', $instance);
+    }
+
+    /**
+     * @expectedException        Framework\Database\Exception\Argument
+     * @expectedExceptionMessage Invalid argument
+     */
+    public function testSettingLimitPropertyException()
+    {
+        $this->query->limit('');
+    }
+
+    public function testSettingLimitProperty()
+    {
+        $instance = $this->query->limit(5, 3);
+
+        $_limit = $this->reflector->getProperty('_limit');
+        $_limit->setAccessible(TRUE);
+
+        assertEquals($_limit->getValue($this->query), 5);
+
+        $_offset = $this->reflector->getProperty('_offset');
+        $_offset->setAccessible(TRUE);
+
+        assertEquals($_offset->getValue($this->query), 10);
+
+        assertInstanceOf('Framework\Database\Query', $instance);
+    }
+
+    /**
+     * @expectedException        Framework\Database\Exception\Argument
+     * @expectedExceptionMessage Invalid argument
+     */
+    public function testSettingOrderPropertyException()
+    {
+        $this->query->order('');
+    }
+
+    public function testSettingOrderProperty()
+    {
+        $instance = $this->query->order('user');
+
+        $_order = $this->reflector->getProperty('_order');
+        $_order->setAccessible(TRUE);
+
+        assertEquals($_order->getValue($this->query), 'user');
+
+        $_direction = $this->reflector->getProperty('_direction');
+        $_direction->setAccessible(TRUE);
+
+        assertEquals($_direction->getValue($this->query), 'asc');
 
         assertInstanceOf('Framework\Database\Query', $instance);
     }
