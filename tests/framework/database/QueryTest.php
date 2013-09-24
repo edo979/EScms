@@ -182,4 +182,31 @@ class QueryTest extends PHPUnit_Framework_TestCase
         assertInstanceOf('Framework\Database\Query', $instance);
     }
 
+    /**
+     * @expectedException        Framework\Database\Exception\Argument
+     * @expectedExceptionMessage Invalid argument
+     */
+    public function testSettinWhererPropertyException()
+    {
+        $this->query->where();
+    }
+
+    public function testSettingWhererProperty()
+    {
+        // Stub escepe method in connector class
+        $this->mock->expects($this->any())
+          ->method('escape')
+          ->will($this->returnValue('clean'));
+
+        $instance = $this->query->where(
+          'user = ? and comment = ?', 'john', 'comment'
+        );
+
+        $_where = $this->reflector->getProperty('_where');
+        $_where->setAccessible(TRUE);
+
+        // stub will return 'clean'
+        assertEquals("user = 'clean' and comment = 'clean'", $_where->getValue($this->query));
+    }
+
 }

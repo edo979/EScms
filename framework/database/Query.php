@@ -153,5 +153,24 @@ class Query extends Base
         
         return $this;
     }
+    
+    public function where()
+    {
+        $arguments = func_get_args();
+        if (sizeof($arguments) < 1)
+        {
+            throw new Exception\Argument('Invalid argument');
+        }
+        
+        $arguments[0] = preg_replace('#\?#', '%s', $arguments[0]);
+        $parameters = array_slice($arguments, 1, NULL, TRUE);
+        
+        foreach ($parameters as $i => $parameter)
+        {
+            $arguments[$i] = $this->_quote($arguments[$i]);
+        }
+        
+        $this->_where = call_user_func_array('sprintf', $arguments);
+    }
 
 }
