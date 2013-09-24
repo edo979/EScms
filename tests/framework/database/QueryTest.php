@@ -43,24 +43,30 @@ class QueryTest extends PHPUnit_Framework_TestCase
     public function testQuotingInputDataForMysqlDatabase()
     {
         // Mock method from connector
-        $this->mock->expects(exactly(3))
+        $this->mock->expects($this->any())
           ->method('escape')
-          ->with($this->stringContains('test'));
+          ->with('test')
+          ->will($this->returnValue("escaped"));
 
         $_quote = $this->reflector->getMethod('_quote');
         $_quote->setAccessible(TRUE);
 
-        // call mocked object vith string
-        $_quote->invoke($this->query, 'test');
+        // call _quote with string
+        $escaped = $_quote->invoke($this->query, 'test');
+        assertEquals("'escaped'", $escaped);
 
-        // call mocked object with array
-        $_quote->invoke($this->query, array('test', 'test'));
+        // call _quote with array
+        $escaped = $_quote->invoke($this->query, array('test', 'test'));
+        assertEquals("'escaped', 'escaped'", $escaped);
 
-        // call mocked object with null
-        $_quote->invoke($this->query, NULL);
+        // call _quote with null
+        $escaped = $_quote->invoke($this->query, NULL);
+        assertEquals("NULL", $escaped);
 
-        // call mocked object with boolean
-        $_quote->invoke($this->query, FALSE);
+        // call _quote with boolean
+        $escaped = $_quote->invoke($this->query, FALSE);
+        assertEquals(0, $escaped);
+
     }
 
     /**
