@@ -212,6 +212,8 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         // stub will return 'clean'
         assertEquals(array("user = 'clean' and comment = 'clean'"), $_where->getValue($this->query));
+        
+        assertInstanceOf('Framework\Database\Query', $instance);
     }
 
     public function testBuildingSelectQueries()
@@ -263,10 +265,29 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         assertEquals("INSERT INTO `user` (`username', 'password`) VALUES ('clean', 'clean')", $insertQuery);
     }
-    
-//    public function testBuildingUpdateQueries()
-//    {
-//        
-//    }
+
+    public function testBuildingUpdateQueries()
+    {
+        // Stub escepe method in connector class
+        $this->mock->expects($this->any())
+          ->method('escape')
+          ->will($this->returnValue('clean'));
+
+        // set query parameters
+        $data = array(
+            'username' => 'john',
+            'password' => 'secret'
+        );
+        $this->query->from('user')
+          ->where('user = ?', 1)
+          ->limit(1);
+
+        // build query
+        $_update = $this->reflector->getMethod('_buildUpdate');
+        $_update->setAccessible(TRUE);
+        $updateQuery = $_update->invoke($this->query, $data);
+
+        assertEquals("UPDATE user SET username = 'clean', password = 'clean' WHERE user = clean LIMIT 1 0", $updateQuery);
+    }
 
 }
