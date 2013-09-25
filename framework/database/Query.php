@@ -221,6 +221,22 @@ class Query extends Base
 
         return sprintf($template, $this->from, $where, $limit);
     }
+    
+    public function save($data)
+    {
+        $isInsert = sizeof($this->_where) == 0;
+        
+        if ($isInsert)
+        {
+            $sql = $this->_buildInsert($data);
+        }
+        else
+        {
+            $sql = $this->_buildUpdate($data);
+        }
+        
+        $result = $this->_connector->execute($sql);
+    }
 
     public function from($from, $fields = array("*"))
     {

@@ -212,7 +212,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         // stub will return 'clean'
         assertEquals(array("user = 'clean' and comment = 'clean'"), $_where->getValue($this->query));
-        
+
         assertInstanceOf('Framework\Database\Query', $instance);
     }
 
@@ -289,7 +289,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         assertEquals("UPDATE user SET username = 'clean', password = 'clean' WHERE user = clean LIMIT 1 0", $updateQuery);
     }
-    
+
     public function testBuildDeleteQueries()
     {
         // Stub escepe method in connector class
@@ -307,6 +307,48 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $deleteQuery = $_delete->invoke($this->query);
 
         assertEquals("DELETE FROM user WHERE user = clean LIMIT 1 0", $deleteQuery);
+    }
+
+//    public function testInsertUpdateMethod()
+//    {
+//        // Test data
+//        $data = array('test' => 'test');
+//
+//        // Make object to test on
+//        $Query = $this->getMock('Framework\Database\Query', array(
+//            '_buildInsert',
+//            '_buildUpdate'
+//        ));
+//
+//        // Mock _buildInsert method
+//        $Query->expects($this->once())
+//          ->method('_buildInsert')
+//          ->with($data);
+//
+//        $Query->save($data);
+//
+//        // Mock _buildUpdate method
+//        $Query->expects($this->once())
+//          ->method('_buildUpdate')
+//          ->with($data);
+//
+//        $Query->where('user = 1');
+//        $Query->save($data);
+//    }
+
+    public function testSaveMethodCallConnectorMethods()
+    {
+        // Test data
+        $data = array('test' => 'test');
+
+        // Mock connector execute method
+        $this->mock->expects($this->any())
+          ->method('execute')
+          ->with($this->stringContains('INSERT INTO'));
+
+        $this->query->from('user');
+        $this->query->save($data);
+        // Mock connector lastInsertId method
     }
 
 }
