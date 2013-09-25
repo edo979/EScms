@@ -169,35 +169,57 @@ class Query extends Base
 
         return sprintf($template, $this->from, $fields, $values);
     }
-    
+
     protected function _buildUpdate($data)
     {
         $parts = array();
         $where = $limit = '';
         $template = "UPDATE %s SET %s %s %s";
-        
+
         foreach ($data as $field => $value)
         {
             $parts[] = "{$field} = " . $this->_quote($value);
         }
-        
+
         $parts = join(", ", $parts);
-        
+
         $_where = $this->where;
         if (!empty($_where))
         {
             $joined = join(", ", $_where);
             $where = "WHERE {$joined}";
         }
-        
+
         $_limit = $this->limit;
         if (!empty($_limit))
         {
             $_offset = $this->offset;
             $limit = "LIMIT {$_limit} {$_offset}";
         }
-        
-         return sprintf($template, $this->from, $parts, $where, $limit);
+
+        return sprintf($template, $this->from, $parts, $where, $limit);
+    }
+
+    protected function _buildDelete()
+    {
+        $where = $limit = '';
+        $template = "DELETE FROM %s %s %s";
+
+        $_where = $this->where;
+        if (!empty($_where))
+        {
+            $joined = join(", ", $_where);
+            $where = "WHERE {$joined}";
+        }
+
+        $_limit = $this->limit;
+        if (!empty($_limit))
+        {
+            $_offset = $this->offset;
+            $limit = "LIMIT {$_limit} {$_offset}";
+        }
+
+        return sprintf($template, $this->from, $where, $limit);
     }
 
     public function from($from, $fields = array("*"))
@@ -278,7 +300,7 @@ class Query extends Base
         }
 
         $this->_where[] = call_user_func_array('sprintf', $arguments);
-        
+
         return $this;
     }
 

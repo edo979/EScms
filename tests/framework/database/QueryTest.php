@@ -289,5 +289,24 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         assertEquals("UPDATE user SET username = 'clean', password = 'clean' WHERE user = clean LIMIT 1 0", $updateQuery);
     }
+    
+    public function testBuildDeleteQueries()
+    {
+        // Stub escepe method in connector class
+        $this->mock->expects($this->any())
+          ->method('escape')
+          ->will($this->returnValue('clean'));
+
+        $this->query->from('user')
+          ->where('user = ?', 1)
+          ->limit(1);
+
+        // build query
+        $_delete = $this->reflector->getMethod('_buildDelete');
+        $_delete->setAccessible(TRUE);
+        $deleteQuery = $_delete->invoke($this->query);
+
+        assertEquals("DELETE FROM user WHERE user = clean LIMIT 1 0", $deleteQuery);
+    }
 
 }
