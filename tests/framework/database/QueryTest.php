@@ -220,7 +220,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->mock->expects($this->any())
           ->method('escape')
           ->will($this->returnValue('clean'));
-        
+
         // set query parameters
         $this->query->from('user', array('id', 'username'));
         $this->query->join('comment', 'user', array(
@@ -236,10 +236,37 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $_select = $this->reflector->getMethod('_buildSelect');
         $_select->setAccessible(TRUE);
         $selectQuery = $_select->invoke($this->query);
-        
+
         assertEquals(
           "SELECT id, username, comment.user_id AS user, comment FROM user JOIN comment ON user WHERE user = id AND user = 'clean' AND id = clean ORDER BY user DESC LIMIT 5, 10"
           , $selectQuery);
     }
+
+    public function testBuildingInsertQueries()
+    {
+        // Stub escepe method in connector class
+        $this->mock->expects($this->any())
+          ->method('escape')
+          ->will($this->returnValue('clean'));
+
+        // set query parameters
+        $data = array(
+            'username' => 'john',
+            'password' => 'secret'
+        );
+        $this->query->from('user');
+
+        // build query
+        $_insert = $this->reflector->getMethod('_buildInsert');
+        $_insert->setAccessible(TRUE);
+        $insertQuery = $_insert->invoke($this->query, $data);
+
+        assertEquals("INSERT INTO `user` (`username', 'password`) VALUES ('clean', 'clean')", $insertQuery);
+    }
+    
+//    public function testBuildingUpdateQueries()
+//    {
+//        
+//    }
 
 }

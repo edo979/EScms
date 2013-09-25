@@ -98,7 +98,7 @@ class Query extends Base
         $fields = array();
         $where = $order = $join = $limit = '';
         $template = "SELECT %s FROM %s %s %s %s %s";
-        
+
         foreach ($this->fields as $table => $_fields)
         {
             foreach ($_fields as $field => $alias)
@@ -113,28 +113,28 @@ class Query extends Base
                 }
             }
         }
-        
+
         $fields = join(", ", $fields);
-        
+
         $_join = $this->join;
         if (!empty($_join))
         {
             $join = join(" ", $_join);
         }
-        
+
         $_where = $this->where;
         if (!empty($_where))
         {
             $joined = join(" AND ", $_where);
             $where = "WHERE {$joined}";
         }
-        
+
         $_order = $this->order;
         if (!empty($_order))
         {
             $order = "ORDER BY {$_order} {$this->direction}";
         }
-        
+
         $_limit = $this->limit;
         if (!empty($_limit))
         {
@@ -148,8 +148,26 @@ class Query extends Base
                 $limit = "LIMIT {$limit}";
             }
         }
-        
+
         return sprintf($template, $fields, $this->from, $join, $where, $order, $limit);
+    }
+
+    protected function _buildInsert($data)
+    {
+        $fields = array();
+        $values = array();
+        $template = "INSERT INTO `%s` (`%s`) VALUES (%s)";
+
+        foreach ($data as $field => $value)
+        {
+            $fields[] = $field;
+            $values[] = $this->_quote($value);
+        }
+
+        $fields = join("', '", $fields);
+        $values = join(", ", $values);
+
+        return sprintf($template, $this->from, $fields, $values);
     }
 
     public function from($from, $fields = array("*"))
