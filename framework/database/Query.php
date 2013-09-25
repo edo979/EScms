@@ -95,8 +95,8 @@ class Query extends Base
 
     protected function _buildSelect()
     {
-        $fields = array();
-        $where = $order = $join = $limit = '';
+        $fields   = array();
+        $where    = $order    = $join     = $limit    = '';
         $template = "SELECT %s FROM %s %s %s %s %s";
 
         foreach ($this->fields as $table => $_fields)
@@ -126,7 +126,7 @@ class Query extends Base
         if (!empty($_where))
         {
             $joined = join(" AND ", $_where);
-            $where = "WHERE {$joined}";
+            $where  = "WHERE {$joined}";
         }
 
         $_order = $this->order;
@@ -154,8 +154,8 @@ class Query extends Base
 
     protected function _buildInsert($data)
     {
-        $fields = array();
-        $values = array();
+        $fields   = array();
+        $values   = array();
         $template = "INSERT INTO `%s` (`%s`) VALUES (%s)";
 
         foreach ($data as $field => $value)
@@ -172,8 +172,8 @@ class Query extends Base
 
     protected function _buildUpdate($data)
     {
-        $parts = array();
-        $where = $limit = '';
+        $parts    = array();
+        $where    = $limit    = '';
         $template = "UPDATE %s SET %s %s %s";
 
         foreach ($data as $field => $value)
@@ -187,14 +187,14 @@ class Query extends Base
         if (!empty($_where))
         {
             $joined = join(", ", $_where);
-            $where = "WHERE {$joined}";
+            $where  = "WHERE {$joined}";
         }
 
         $_limit = $this->limit;
         if (!empty($_limit))
         {
             $_offset = $this->offset;
-            $limit = "LIMIT {$_limit} {$_offset}";
+            $limit   = "LIMIT {$_limit} {$_offset}";
         }
 
         return sprintf($template, $this->from, $parts, $where, $limit);
@@ -202,30 +202,30 @@ class Query extends Base
 
     protected function _buildDelete()
     {
-        $where = $limit = '';
+        $where    = $limit    = '';
         $template = "DELETE FROM %s %s %s";
 
         $_where = $this->where;
         if (!empty($_where))
         {
             $joined = join(", ", $_where);
-            $where = "WHERE {$joined}";
+            $where  = "WHERE {$joined}";
         }
 
         $_limit = $this->limit;
         if (!empty($_limit))
         {
             $_offset = $this->offset;
-            $limit = "LIMIT {$_limit} {$_offset}";
+            $limit   = "LIMIT {$_limit} {$_offset}";
         }
 
         return sprintf($template, $this->from, $where, $limit);
     }
-    
+
     public function save($data)
     {
         $isInsert = sizeof($this->_where) == 0;
-        
+
         if ($isInsert)
         {
             $sql = $this->_buildInsert($data);
@@ -234,8 +234,33 @@ class Query extends Base
         {
             $sql = $this->_buildUpdate($data);
         }
-        
+
         $result = $this->_connector->execute($sql);
+
+        if ($result === false)
+        {
+            throw new Exception\Sql();
+        }
+
+        if ($isInsert)
+        {
+            return $this->_connector->getLastInsertId();
+        }
+
+        return 0;
+    }
+
+    public function delete()
+    {
+        $sql    = $this->_buildDelete();
+        $result = $this->_connector->execute($sql);
+
+        if ($result === false)
+        {
+            throw new Exception\Sql();
+        }
+
+        return $this->_connector->getAffectedRows();
     }
 
     public function from($from, $fields = array("*"))
@@ -280,7 +305,7 @@ class Query extends Base
             throw new Exception\Argument('Invalid argument');
         }
 
-        $this->_limit = $limit;
+        $this->_limit  = $limit;
         $this->_offset = $limit * ($page - 1);
 
         return $this;
@@ -293,7 +318,7 @@ class Query extends Base
             throw new Exception\Argument('Invalid argument');
         }
 
-        $this->_order = $order;
+        $this->_order     = $order;
         $this->_direction = $direction;
 
         return $this;
@@ -308,7 +333,7 @@ class Query extends Base
         }
 
         $arguments[0] = preg_replace('#\?#', '%s', $arguments[0]);
-        $parameters = array_slice($arguments, 1, NULL, TRUE);
+        $parameters   = array_slice($arguments, 1, NULL, TRUE);
 
         foreach ($parameters as $i => $parameter)
         {

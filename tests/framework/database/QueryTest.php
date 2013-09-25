@@ -18,16 +18,17 @@ class QueryTest extends PHPUnit_Framework_TestCase
         // using protected method and property in tested class
         $this->reflector = new ReflectionClass($this->query);
 
-        // Set connector (depedency)
-        $_connector = $this->reflector->getProperty('_connector');
-        $_connector->setAccessible(TRUE);
-        $_connector->setValue($this->query, $this->mock);
+//        // Set connector (depedency)
+//        $_connector = $this->reflector->getProperty('_connector');
+//        $_connector->setAccessible(TRUE);
+//        $_connector->setValue($this->query, $this->mock);
+        $this->query->connector = $this->mock;
     }
 
     public function tearDown()
     {
-        $this->_mock = null;
-        $this->query = null;
+        $this->_mock     = null;
+        $this->query     = null;
         $this->reflector = null;
     }
 
@@ -87,7 +88,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         $_fields = $this->reflector->getProperty('_fields');
         $_fields->setAccessible(TRUE);
-        $fields = $_fields->getValue($this->query);
+        $fields  = $_fields->getValue($this->query);
         assertEquals(array('name', 'id'), $fields['user']);
 
         assertInstanceOf('Framework\Database\Query', $instance);
@@ -120,7 +121,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
 
         $_fields = $this->reflector->getProperty('_fields');
         $_fields->setAccessible(TRUE);
-        $fields = $_fields->getValue($this->query);
+        $fields  = $_fields->getValue($this->query);
 
         assertEquals(array(
             'username' => 'name',
@@ -235,7 +236,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->query->limit(5, 3);
 
         // build query
-        $_select = $this->reflector->getMethod('_buildSelect');
+        $_select     = $this->reflector->getMethod('_buildSelect');
         $_select->setAccessible(TRUE);
         $selectQuery = $_select->invoke($this->query);
 
@@ -259,7 +260,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->query->from('user');
 
         // build query
-        $_insert = $this->reflector->getMethod('_buildInsert');
+        $_insert     = $this->reflector->getMethod('_buildInsert');
         $_insert->setAccessible(TRUE);
         $insertQuery = $_insert->invoke($this->query, $data);
 
@@ -283,7 +284,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
           ->limit(1);
 
         // build query
-        $_update = $this->reflector->getMethod('_buildUpdate');
+        $_update     = $this->reflector->getMethod('_buildUpdate');
         $_update->setAccessible(TRUE);
         $updateQuery = $_update->invoke($this->query, $data);
 
@@ -302,53 +303,84 @@ class QueryTest extends PHPUnit_Framework_TestCase
           ->limit(1);
 
         // build query
-        $_delete = $this->reflector->getMethod('_buildDelete');
+        $_delete     = $this->reflector->getMethod('_buildDelete');
         $_delete->setAccessible(TRUE);
         $deleteQuery = $_delete->invoke($this->query);
 
         assertEquals("DELETE FROM user WHERE user = clean LIMIT 1 0", $deleteQuery);
     }
 
-//    public function testInsertUpdateMethod()
-//    {
-//        // Test data
-//        $data = array('test' => 'test');
-//
-//        // Make object to test on
-//        $Query = $this->getMock('Framework\Database\Query', array(
-//            '_buildInsert',
-//            '_buildUpdate'
-//        ));
-//
-//        // Mock _buildInsert method
-//        $Query->expects($this->once())
-//          ->method('_buildInsert')
-//          ->with($data);
-//
-//        $Query->save($data);
-//
-//        // Mock _buildUpdate method
-//        $Query->expects($this->once())
-//          ->method('_buildUpdate')
-//          ->with($data);
-//
-//        $Query->where('user = 1');
-//        $Query->save($data);
-//    }
+    public function testInsertUpdateQueries()
+    {
+        // Test data
+        $data = array('test' => 'test');
+
+        // Make object to test on
+        $Query = $this->getMock('Framework\Database\Query', array(
+            '_buildInsert',
+            '_buildUpdate'
+        ));
+
+        // mock depedency connector to object
+        $Query->connector = $this->mock;
+
+        // Mock _buildInsert method
+        $Query->expects($this->once())
+          ->method('_buildInsert')
+          ->with($data);
+
+        $Query->save($data);
+
+        // Mock _buildUpdate method
+        $Query->expects($this->once())
+          ->method('_buildUpdate')
+          ->with($data);
+
+        $Query->where('user = 1');
+        $Query->save($data);
+    }
 
     public function testSaveMethodCallConnectorMethods()
     {
         // Test data
         $data = array('test' => 'test');
 
-        // Mock connector execute method
+        // Mock connector execute method insert
         $this->mock->expects($this->any())
           ->method('execute')
-          ->with($this->stringContains('INSERT INTO'));
+          ->with($this->stringContains('INSERT'))
+          ->will(returnValue(TRUE));
 
         $this->query->from('user');
         $this->query->save($data);
+
         // Mock connector lastInsertId method
+        $this->mock->expects($this->once())
+          ->method('getLastInsertId');
+
+        $this->query->save($data);
+    }
+    
+    public function testDeleteQuery()
+    {
+         // Make object to test on
+        $Query = $this->getMock('Framework\Database\Query', array(
+            '_buildDelete'
+        ));
+        $Query->expects($this->once())
+          ->method('_buildDelete');
+        
+        // Set connector mock method
+        $this->mock->expects($this->once())
+          ->method('execute');
+        
+         $this->mock->expects($this->once())
+          ->method('getAffectedRows');
+
+        // mock depedency connector to object
+        $Query->connector = $this->mock;
+        
+        $Query->delete();
     }
 
 }
