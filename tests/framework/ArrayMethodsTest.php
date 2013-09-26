@@ -24,5 +24,13 @@ class ArrayMethodsTest extends \PHPUnit_Framework_TestCase
 
         assertEquals($result, array(1, 2, 3, 4));
     }
+    
+    public function testReturningFirstArrayItem()
+    {
+        $array = array('user' => 'john', 'id' => 1);
+        $result = ArrayMethods::first($array);
+        
+        assertEquals('john', $result);
+    }
 
 }

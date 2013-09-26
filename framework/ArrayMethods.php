@@ -37,5 +37,16 @@ class ArrayMethods
 
         return $return;
     }
+    
+    public static function first($array)
+    {
+        if (sizeof($array) == 0)
+        {
+            return NULL;
+        }
+        
+        $keys = array_keys($array);
+        return $array[$keys[0]];
+    }
 
 }
