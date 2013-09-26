@@ -382,5 +382,54 @@ class QueryTest extends PHPUnit_Framework_TestCase
         
         $Query->delete();
     }
+    
+    public function testGetFirstRowFromQuery()
+    {
+        // Create mock all(), returning some data
+        $mock = $this->getMock('Framework\Database\Query\Mysql', array('all'));
+        $mock->expects($this->any())
+          ->method('all')
+          ->will($this->returnValue(array(
+              0 => array('user' => 'john')
+          )));
+        // Test reseting query value
+        $mock->limit(5,5);
+        
+        // Call method first()
+        $result = $mock->first();
+        
+        // Test reseting query value
+        assertEquals(5, $mock->limit);
+        assertEquals(20, $mock->offset);
+        
+        // Test result
+        assertEquals(array('user'=>'john'), $result);
+    }
+    
+    public function testCountingRows()
+    {
+        // create mock first(), will return some data
+        $mock = $this->getMock('Framework\Database\Query', array('first'));
+        $mock->expects($this->any())
+          ->method('first')
+          ->will($this->returnValue(array(
+              'rows' => 101
+          )));
+        
+        // Test reseting query value
+        $mock->limit(5, 5);
+        $mock->from('user', array('id'));
+        
+        // call method count()
+        $result = $mock->count();
+        
+        // Test reseting query value
+        assertEquals(5, $mock->limit);
+        assertEquals(20, $mock->offset);
+        assertEquals(array('user'=>array('id')), $mock->fields);
+        
+        // test result
+        assertEquals(101, $result);
+    }
 
 }
